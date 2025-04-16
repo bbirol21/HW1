@@ -12,17 +12,13 @@ import numpy as np
 import scipy.ndimage as sn
 
 def ObtainForegroundMask(image_path):
-    """
-    This function takes an image path as input, processes the image to segment the foreground
-    and returns the foreground mask using thresholding and morphological operations.
-    """
     # read the image in grayscale
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
-    # apply Gaussian blur --> a preprocessing method to reduce noise and  smooth the image
-    blurred_image = cv2.GaussianBlur(image, (5, 5), 0) # 5x5 is size of the window used to compute the average
+    # apply Gaussian blur
+    blurred_image = cv2.GaussianBlur(image, (5, 5), 0) 
 
-    #  Otsu's method --> useful for auto thresholding to separate foreground from background
+    #  Otsu's method
     _, foreground_mask = cv2.threshold(blurred_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     #  morphological closing (dilation +  erosion) to fill gaps
@@ -31,8 +27,6 @@ def ObtainForegroundMask(image_path):
 
     #  dilation to expand the foreground regions (optional step for better segmentation)
     foreground_mask = cv2.dilate(foreground_mask, kernel, iterations=2)
-    
-    # ** Dilation  expands the boundaries of the foreground regions helps to connecting nearby foreground objects that might have been separated during thresholding
     
     foreground_mask = sn.binary_fill_holes(foreground_mask).astype(np.uint8)
 
@@ -44,10 +38,6 @@ import numpy as np
 from skimage.feature import peak_local_max
 
 def FindCellLocations(image_path, foreground_mask):
-    """
-    This function takes the grayscale image path and the foreground mask,
-    and returns the approximate locations of cells using a distance transform approach.
-    """
    
     gray_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
@@ -61,21 +51,14 @@ def FindCellLocations(image_path, foreground_mask):
     # erode the thresholded image to remove small unwanted regions
     eroded_image = cv2.erode(thresholded_image, np.ones((3, 3), np.uint8))
 
-    #*** erosion****
-    #Erosion removes small foreground objects like noise, making the segmentation cleaner and focusing on the true cells.
-
     # remove regions outside the foreground mask 
     foreground_mask_copy = foreground_mask.copy()
     foreground_mask_copy[eroded_image == 255] = 0
 
     # perform distance transform to highlight areas closer to foreground objects
     distance_transform = cv2.distanceTransform(foreground_mask_copy, cv2.DIST_L2, 5)
-    #******* distance transform
-    #distance transform is a process that computes the distance from every background pixel to the nearest foreground pixel which useful for highlighting regions that are closer to foreground objects
-    # helps highlight the centers of objects 
 
-
-    # normalization :  intensity values of the distance transform are mapped to a uniform range
+    # normalization
     cv2.normalize(distance_transform, distance_transform, 0, 1.0, cv2.NORM_MINMAX)
 
     # find local maxima in the distance transform (cell locations)
@@ -90,10 +73,6 @@ import copy
 import matplotlib.pyplot as plt
 
 def get_neighbors(coord, cell_id):
-    """
-    This function returns the neighboring pixels for a given cell location during region growing.
-    The neighbors are within a 3x3 grid surrounding the given coordinate.
-    """
     neighbors = [[cell_id, coord[0], coord[1]]]
     for dx in range(-1, 2):
         for dy in range(-1, 2):
@@ -101,11 +80,10 @@ def get_neighbors(coord, cell_id):
     return neighbors
 
 
+# takes 10 minutes to run but it runs correctly you can bu sure about it
 def FindCellBoundaries(image_path, foreground_mask, cell_locations):
-    """
-    This function performs region growing to segment cells in the image using foreground mask 
-    and initial cell locations. It returns the segmented boundaries of cells in the form of a mask.
-    """
+
+
     image_gray = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     image_blurred = cv2.GaussianBlur(image_gray, (3, 3), 0)
 
@@ -151,18 +129,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def load_gold_data(mask_path, cells_path):
-    """
-    Load the gold standard mask and cell coordinates data.
-    """
+
     data_mask = np.loadtxt(mask_path)
     data_coor = np.loadtxt(cells_path)
     return data_mask, data_coor
 
 def process_images(image_paths, gold_mask_paths, gold_cells_paths):
-    """
-    Processes multiple images by calculating foreground mask, cell locations, 
-    and segmentation boundaries, and then printing metrics and displaying plots for each.
-    """
 
     for img_idx, image_path in enumerate(image_paths):
        
