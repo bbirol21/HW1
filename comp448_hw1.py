@@ -76,7 +76,7 @@ def evaluate_mask(predicted_mask, gold_mask_path):
 
 
 def test_of_part1():
-    image_files = ['im1.jpg', 'im2.jpg', 'im3.jpg']
+    image_files = ['/Users/ezgiakk/Desktop/448_hw1/HW1/im1.jpg', '/Users/ezgiakk/Desktop/448_hw1/HW1/im2.jpg', '/Users/ezgiakk/Desktop/448_hw1/HW1/im3.jpg']
     gold_mask_files = ['im1_gold_mask.txt', 'im2_gold_mask.txt', 'im3_gold_mask.txt']
 
     results = []
@@ -243,8 +243,14 @@ def test_of_part2():
     """
     import time, os
     # Define file names for the images and the gold cell labels.
-    image_files = ['im1.jpg', 'im2.jpg', 'im3.jpg']
-    gold_cells_files = ['im1_gold_cells.txt', 'im2_gold_cells.txt', 'im3_gold_cells.txt']
+    image_files = ['/Users/ezgiakk/Desktop/448_hw1/HW1/im1.jpg', '/Users/ezgiakk/Desktop/448_hw1/HW1/im2.jpg', '/Users/ezgiakk/Desktop/448_hw1/HW1/im3.jpg']
+    gold_cells_files = [
+    '/Users/ezgiakk/Desktop/448_hw1/HW1/im1_gold_cells.txt',
+    '/Users/ezgiakk/Desktop/448_hw1/HW1/im2_gold_cells.txt',
+    '/Users/ezgiakk/Desktop/448_hw1/HW1/im3_gold_cells.txt'
+]
+
+
     
     results = []
     print("Starting cell location detection evaluation...\n")
